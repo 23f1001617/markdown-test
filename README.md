@@ -2,7 +2,7 @@
 
 Generated app for:
 
-> Create a webpage that converts input.md into HTML and displays it inside #markdown-output.
+> Create a static page that loads input.md from attachments, converts it to HTML, and displays it inside #markdown-output with inline CSS and JS.
 
 ---
 MIT License
