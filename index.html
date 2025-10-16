@@ -7,54 +7,76 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
         #markdown-output {
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
         }
-        h1, h2, h3 {
-            color: #333;
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #888;
+        }
+        button {
+            padding: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <button id="toggle-theme">Toggle Theme</button>
     <div id="markdown-output">Loading...</div>
+    <footer><!-- build-id: 2023-10-01T12:00:00Z --></footer>
+
     <script>
-        async function fetchMarkdown() {
-            try {
-                const response = await fetch('input.md');
+        document.getElementById('toggle-theme').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        fetch('./input.md')
+            .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
-                const text = await response.text();
-                document.getElementById('markdown-output').innerHTML = marked(text);
-            } catch (error) {
-                document.getElementById('markdown-output').innerHTML = 'Error loading markdown: ' + error.message;
-            }
-        }
-
-        const marked = (function() {
-            const renderer = new marked.Renderer();
-            marked.setOptions({
-                renderer: renderer,
-                gfm: true,
-                tables: true,
-                breaks: true,
-                pedantic: false,
-                sanitize: false,
-                smartLists: true,
-                smartypants: false
+                return response.text();
+            })
+            .then(text => {
+                const html = markdownToHtml(text);
+                document.getElementById('markdown-output').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('markdown-output').innerHTML = 'Failed to load data.';
+                console.error('There was a problem with the fetch operation:', error);
             });
-            return function(markdown) {
-                return marked(markdown);
-            };
-        })();
 
-        fetchMarkdown();
+        function markdownToHtml(markdown) {
+            // Simple Markdown to HTML conversion
+            return markdown
+                .replace(/###### (.+)/g, '<h6>$1</h6>')
+                .replace(/##### (.+)/g, '<h5>$1</h5>')
+                .replace(/#### (.+)/g, '<h4>$1</h4>')
+                .replace(/### (.+)/g, '<h3>$1</h3>')
+                .replace(/## (.+)/g, '<h2>$1</h2>')
+                .replace(/# (.+)/g, '<h1>$1</h1>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/!\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, '<figure><img src="$2" alt="$1"/><figcaption>$1</figcaption></figure>')
+                .replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\n/g, '<br/>');
+        }
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/2.1.3/marked.min.js"></script>
 </body>
 </html>
-<!-- build-id: 2025-10-16T07:31:16.931616 -->
+<!-- build-id: 2025-10-16T11:29:05.702449 -->
